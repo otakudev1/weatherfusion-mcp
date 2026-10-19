@@ -52,14 +52,14 @@ def main():
     print("[4/5] Restarting Space…")
     api.restart_space(repo_id=args.repo_id)
 
-    owner, name = args.repo_id.spit("/")
+    owner, name = args.repo_id.split("/")
     space_url = f"https://huggingface.co/spaces/{args.repo_id}"
     sse_url = f"https://{owner.lower()}-{name.lower()}.hf.space/sse"
 
-    print("[5/5] Health check (expect 401 — auth wall up)...")
+    print("[5/5] Health check (expect 401 — auth wall up)…")
     try:
         r = httpx.get(sse_url, timeout=15.0, follow_redirects=True)
-        print(f"     /sse -> HTTPpr.status_code} (401 = fail-closed auth working)")
+        print(f"      /sse -> HTTP {r.status_code} (401 = fail-closed auth working)")
     except Exception as e:
         print(f"      Space still building (first build takes ~2-3 min): {e}")
 
