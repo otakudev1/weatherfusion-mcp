@@ -131,10 +131,10 @@ async def call_tool(name: str, arguments: dict) -> list[TextContent]:
 
 
 def verify_token(token: str) -> dict:
-    """JWKS-first verification (publickeys, no secret). HS256 fallback only for
+    """JWKS-first verification (public keys, no secret). HS256 fallback only for
     legacy Supabase projects where SUPABASE_JWT_SECRET is explicitly provided."""
     try:
-        signing_key = _jkw_client.get_signing_key_from_jwt(token)
+        signing_key = _jwk_client.get_signing_key_from_jwt(token)
         return jwt.decode(token, signing_key.key, algorithms=["ES256", "RS256"], audience="authenticated")
     except jwt.PyJWKClientError:
         if not SUPABASE_JWT_SECRET:
@@ -142,11 +142,11 @@ def verify_token(token: str) -> dict:
                 "Token not verifiable via JWKS and no legacy SUPABASE_JWT_SECRET configured"
             )
     if SUPABASE_JWT_SECRET:
-        return jwt.decode(token, SUPABASE_JWT_SECRET, algorithms=[HS256"], audience="authenticated")
+        return jwt.decode(token, SUPABASE_JWT_SECRET, algorithms=["HS256"], audience="authenticated")
     raise jwt.InvalidTokenError("No verification method available")
 
 
-# ------ Transport + Auth -------------------------------------------------
+# ---- Transport + Auth -------------------------------------------------
 sse = SseServerTransport("/messages")
 
 
