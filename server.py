@@ -391,7 +391,7 @@ async def handle_sse(request: Request):
     if not SUPABASE_URL:
         logger.warning("OPEN MODE: accepting unauthenticated SSE connection (client=%s)", request.client.host if request.client else "unknown")
         session_scopes.set({REQUIRED_SCOPE})
-        async with sse.connect_sse(request.scope, request.receive, request.send) as (read_stream, write_stream):
+        async with sse.connect_sse(request.scope, request.receive, request._send) as (read_stream, write_stream):
             await mcp.run(read_stream, write_stream, mcp.create_initialization_options())
         return
 
@@ -411,7 +411,7 @@ async def handle_sse(request: Request):
     session_scopes.set(scopes)
     logger.info("SSE session established; scopes=%s", scopes)
 
-    async with sse.connect_sse(request.scope, request.receive, request.send) as (read_stream, write_stream):
+    async with sse.connect_sse(request.scope, request.receive, request._send) as (read_stream, write_stream):
         await mcp.run(read_stream, write_stream, mcp.create_initialization_options())
 
 
