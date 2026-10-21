@@ -416,6 +416,7 @@ async def handle_sse(request: Request):
 
 
 routes = [
+    Route("/health", lambda request: JSONResponse({"status": "ok", "service": "weatherfusion-mcp"})),
     Route("/sse", endpoint=handle_sse),
     Mount("/messages", app=sse.handle_post_message),
 ]
