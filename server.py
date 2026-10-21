@@ -383,7 +383,7 @@ def verify_token(token: str) -> dict:
 
 
 # ---- Transport ----------------------------------------------------------
-sse = SseServerTransport("/messages")
+sse = SseServerTransport("/messages/")
 
 
 async def handle_sse(request: Request):
@@ -411,8 +411,8 @@ async def handle_sse(request: Request):
     session_scopes.set(scopes)
     logger.info("SSE session established; scopes=%s", scopes)
 
-    async with sse.connect_session(request.scope, request.receive, request.send) as session:
-        await mcp.run(session)
+    async with sse.connect_sse(request.scope, request.receive, request.send) as (read_stream, write_stream):
+        await mcp.run(read_stream, write_stream, mcp.create_initialization_options())
 
 
 routes = [
