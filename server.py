@@ -28,6 +28,7 @@ logger = logging.getLogger("wf-mcp")
 WF_BASE = os.environ.get("WEATHERFUSION_API_URL", "").rstrip("/") or None
 SUPABASE_URL = os.environ.get("SUPABASE_URL", "").rstrip("/") or None
 SUPABASE_JWT_SECRET = os.getenv("SUPABASE_JWT_SECRET")  # optional: legacy HS256 projects only
+SUPABASE_ANON_KEY = os.getenv("SUPABASE_ANON_KEY")  # needed for JWKS apikey header on newer projects
 REQUIRED_SCOPE = "weatherfusion:read"
 PORT = int(os.getenv("MCP_PORT", "7860"))
 
@@ -44,7 +45,8 @@ else:
 _jwk_client = None
 if SUPABASE_URL:
     JWKS_URL = f"{SUPABASE_URL}/auth/v1/.well-known/jwks.json"
-    _jwk_client = jwt.PyJWKClient(JWKS_URL)
+    _jwk_headers = {"apikey": SUPABASE_ANON_KEY} if SUPABASE_ANON_KEY else None
+    _jwk_client = jwt.PyJWKClient(JWKS_URL, headers=_jwk_headers)
 else:
     logger.warning("=" * 65)
     logger.warning("SUPABASE_URL NOT SET — running in OPEN AUTH MODE.")
